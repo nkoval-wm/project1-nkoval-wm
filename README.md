@@ -8,18 +8,25 @@ The concrete example below uses open CMS dimuon data from the CERN Open Data Por
 
 ```text
 .
+project1-nkoval-wm/
+├── .github/
+├── .vscode/
+├── data/
+├── figures/
+│   ├── Bootstrap Analysis.png
+│   ├── fit_troubleshooting.png
+│   ├── Four_Peak_Mass_Fit.png
+│   ├── Likelihood_Intensity_Model.png
+│   ├── Normalized_Residual.png
+│   └── Profile_Likelihood_Signal_Yields.png
+├── notebooks/
+│   ├── Four_Peak_model.ipynb
+│   └── load_and_compute_mass.ipynb
+├── venvp1/
 ├── .gitignore
 ├── README.md
 ├── requirements.txt
-├── data/
-│   └── raw/
-│       └──  (downloaded data; do not commit)
-├── figures/
-│   └── .gitkeep
-├── notebooks/
-│   └── load_and_compute_mass.ipynb
-└── scripts/
-    └──  (optional reproducibility script)
+└── Results.csv
 ```
 
 ## Setup
@@ -46,9 +53,7 @@ After installing packages, open `notebooks/load_and_compute_mass.ipynb` and sele
 
 ## Scientific question
 
-Using public CMS dimuon events, estimate the masses and relative yields of the Upsilon(1S), Upsilon(2S), and Upsilon(3S) states from the invariant-mass distribution between about 8 and 12 GeV. Ask whether the data in your chosen mass window support three distinct resonance components over a smooth background, and test whether adding a fourth Upsilon-like peak near the Upsilon(4S) mass is required by the data. Explain how strongly your conclusion depends on assumptions about peak widths, background shape, and binning.
-
-The natural widths of these states are only tens of keV, much smaller than the detector mass resolution in this simplified analysis. Treat fitted Gaussian widths as effective detector/analysis resolution parameters, not measurements of the intrinsic Upsilon widths.
+Using public CMS dimuon events, we set out to estimate the masses and relative yields of the Upsilon(1S), Upsilon(2S), and Upsilon(3S) states from the invariant-mass distribution between about 8 and 12 GeV. Further, we investigate the presence of a fourth Upsilon(4S) peak.
 
 ## Data
 
@@ -58,7 +63,7 @@ Use the CMS Open Data record for derived 2011 Upsilon-to-dimuon candidate events
 https://opendata.cern.ch/record/cms-5206
 ```
 
-The parent record describing related simplified Run2011A lepton data sets is:
+The parent record describing related simplified Run211A lepton data sets is:
 
 ```text
 https://opendata.cern.ch/record/cms-545
@@ -68,78 +73,210 @@ The Upsilon sample contains 20,000 events selected from DoubleMu 2011 with two m
 
 Do not commit the downloaded table, generated scratch output, or `.venv/`. Record the URL, download date, and any filtering or column transformations in your analysis. Inspect the table rather than assuming that every column is needed. The starter notebook in `notebooks/` shows how to compute the invariant mass from `E1`, `px1`, `py1`, `pz1`, `E2`, `px2`, `py2`, and `pz2`; check the units and explain the mass window and event selections you use.
 
-## Suggested direction
+```markdown
 
-Develop an analysis chain that includes, at minimum:
+## Results
 
-- an inspection and visualization of the data with uncertainties;
-- a clearly defined smooth-background model for the selected mass window;
-- a signal-plus-background model with three nearby Upsilon peaks, such as three Gaussian peaks on a linear, polynomial, or exponential background;
-- a binned Poisson likelihood or a weighted least-squares fit to histogram counts, with sensible parameter initialization and bounds where needed;
-- residual or pull diagnostics that are appropriate for counting data;
-- a goodness-of-fit assessment and a model-comparison argument that does not rely only on reduced chi-square;
-- a hypothesis test or likelihood-ratio comparison of a three-peak model against a four-peak model, with a clear statement of caveats;
-- a parameter uncertainty statement, including the fit covariance or curvature estimate and one resampling-based check such as a bootstrap or jackknife;
-- a short discussion of sensitivity to at least one analysis choice, such as bin width, mass window, background form, shared versus independent peak widths, fixed versus floating peak separations, or starting point.
+The data and following analysis support a model consisting of three Upsilon resonances on top of a polynomial Chebyshev background. The best-fit model gives signal yields and mass locations of
 
-You may use `scipy.optimize.curve_fit`, `scipy.optimize.least_squares`, or a likelihood-based optimizer. If you use weighted least squares, justify the binning and the count uncertainties. If you use a Poisson likelihood, state the likelihood clearly and explain how you estimate parameter uncertainties. Keep units explicit throughout.
-
-A reasonable starting point is the full 8--12 GeV Upsilon sample. A minimal signal model might include three Gaussian normalizations, one common width, one overall mass offset or scale, and background parameters. For the fourth-peak test, a conservative approach is to add one nonnegative peak normalization near the PDG Upsilon(4S) mass while keeping the mass offset and resolution treatment consistent with the three-peak model. A stronger analysis might compare this to a model with independent widths, fixed PDG mass splittings, or a different background shape. Be careful: allowing every peak position and width to float independently may make the fit less stable than it first appears.
-
-For the three-versus-four peak comparison, do not report a p-value mechanically. The additional signal yield is bounded below by zero, and any search over possible fourth-peak locations introduces a look-elsewhere effect. A likelihood-ratio statistic is still useful, but your interpretation should state whether the fourth-peak mass was fixed in advance and what approximation you used.
-
-The lectures provide the relevant tools: weighted least squares and covariance (Lecture 4), diagnosing fit failures and weak identification (Lecture 5), minimizers and derivatives (Lecture 6), goodness of fit and nested-model comparison (Lecture 7), and bootstrap/jackknife uncertainty (Lecture 8). You are not expected to reproduce every technique. Choose the methods that answer your question credibly.
-
-## Reference Values and Example
-
-Use the Particle Data Group values as external reference points, not as results you are trying to force the fit to reproduce:
-
-| State | PDG mass | PDG natural width |
+| Resonance | Fitted Mass (GeV) | Signal Yield |
 | --- | ---: | ---: |
-| Upsilon(1S) | 9460.40 +/- 0.10 MeV | 54.02 +/- 1.25 keV |
-| Upsilon(2S) | 10023.4 +/- 0.5 MeV | 31.98 +/- 2.63 keV |
-| Upsilon(3S) | 10355.1 +/- 0.5 MeV | 20.32 +/- 1.85 keV |
-| Upsilon(4S) | 10579.4 +/- 1.2 MeV | 20.5 +/- 2.5 MeV |
+| $\Upsilon(1S)$ | 9.4460 | 2238 |
+| $\Upsilon(2S)$ | 10.014 | 825 |
+| $\Upsilon(3S)$ | 10.346 | 558 |
 
-For an example of how CMS presents a professional Upsilon mass-spectrum fit in the same dimuon final state, see Figure 1-a from CMS-BPH-12-006:
 
-![CMS Upsilon dimuon mass fit example](https://cms-results.web.cern.ch/cms-results/public-results/publications/BPH-12-006/CMS-BPH-12-006_Figure_001-a.png)
+The reduced chi2, p-value, and likelihood-ratio comparisons support the use of the three-peak model. In particular, the signal-plus-background model provides a substantial improvement over a background-only model, while the addition of a fourth peak produces only a nominal improvement in likelihood despite adding three additional parameters.
 
-PDF version of the figure: https://cms-results.web.cern.ch/cms-results/public-results/publications/BPH-12-006/CMS-BPH-12-006_Figure_001-a.pdf
 
-That figure comes from a full CMS publication with a much more complete analysis chain than this project, not from the simplified education CSV directly. Use it as a visual benchmark for what a fit, component model, and pull distribution can look like, not as a template to copy exactly.
+## Analysis
 
-Suggested references:
+In this project we develop a model for the Upsilon resonances in the CMS dimuon spectrum. We evaluate the 8-12 GeV mass range and model the data using three Gaussian peaks on top of a second-order Chebyshev polynomial background. The initial guesses for the three peak locations are taken from the Particle Data Group values for the \(\Upsilon(1S)\), \(\Upsilon(2S)\), and \(\Upsilon(3S)\) resonances.
 
-- CMS Open Data, "Y to two muons from 2011": https://opendata.cern.ch/record/cms-5206
-- CMS Open Data, "Datasets derived from the Run2011A SingleElectron, SingleMu, DoubleElectron, and DoubleMu primary datasets": https://opendata.cern.ch/record/cms-545
-- Particle Data Group, Upsilon(1S): https://pdglive.lbl.gov/Particle.action?node=M049
-- Particle Data Group, Upsilon(2S): https://pdgprod.lbl.gov/pdgprod/pdgLive/Particle.action?node=M052
-- Particle Data Group, Upsilon(3S): https://pdglive.lbl.gov/Particle.action?node=M048
-- Particle Data Group, Upsilon(4S): https://pdgprod.lbl.gov/pdgprod/pdgLive/Particle.action?home=sumtabM&node=M047
-- CMS Collaboration, "Measurements of the Upsilon(1S), Upsilon(2S), and Upsilon(3S) differential cross sections in pp collisions at sqrt(s) = 7 TeV," Phys. Lett. B 749 (2015) 14: https://cms-results.web.cern.ch/cms-results/public-results/publications/BPH-12-006/
+Our full model is
 
-## Deliverable
+\[
+I(m)
+=
+N_1G_1(m)
++
+N_2G_2(m)
++
+N_3G_3(m)
++
+N_bB(m),
+\]
 
-Submit a concise, reproducible analysis in a notebook, script, or combination of both. It should allow another student to download the public data and regenerate your main results. Your final work should go beyond the starter notebook by fitting models, comparing them, and making an uncertainty statement. Include:
+where \(N_1\), \(N_2\), and \(N_3\) are the signal yields of the three Upsilon peaks, \(N_b\) is the background yield, and the \(G_i(m)\) are Gaussian distributions. The background is modeled using a second-order Chebyshev polynomial,
 
-- a brief statement of the scientific question and data provenance;
-- the model equations, fitted parameters, units, and uncertainty method;
-- one figure showing the data, fitted models, and useful residual information;
-- a compact results table;
-- your model-comparison result, including the three-versus-four peak test and its limitations;
-- a paragraph distinguishing statistical uncertainty from unmodeled systematics and analysis sensitivity.
+\[
+B(m)
+\propto
+T_0(x)+c_1T_1(x)+c_2T_2(x),
+\]
 
-Save final figures in `figures/` and keep exploratory files out of the repository. Your conclusion should report what the data support, not simply which optimizer returned the smallest objective. It is acceptable if your exact fitted values differ from another student's values, provided your modeling choices are documented and defensible.
+where the 8-12 GeV mass range is mapped onto the standard Chebyshev domain \([-1,1]\). Each signal and background distribution is normalized over the selected mass range.
 
-```text
-figures/upsilon_resonance_fit.png
-```
+We fit the data using an extended unbinned Poisson likelihood. The model intensity is evaluated at the mass of each observed event and has units of events/GeV. When plotting the model against a histogram, we multiply the intensity by the histogram bin width to convert it to events/bin.
 
-You should also update this `README.md` with the exact command(s) needed to rerun your analysis.
+The negative log-likelihood is
 
-## Submission
+\[
+-\ln L
+=
+N_{\mathrm{model}}
+-
+\sum_i \ln I(m_i),
+\]
 
-This repository should remain private inside the `WM-PHYS690-Fall2026` GitHub organization. Make meaningful commits as you work, then push your final work.
+where
 
-Finally, submit a pull request from the `submission` branch into `main` in your private project repository. This will inform Prof. Stevens that your submission is ready to be evaluated.
+\[
+N_{\mathrm{model}}
+=
+N_1+N_2+N_3+N_b.
+\]
+
+This means that the fit uses both the total number of observed events and where each event occurs in the mass spectrum. We optimize the model parameters using `scipy.optimize.minimize`, with bounds and physically reasonable initial parameter guesses.
+
+### Goodness of Fit
+
+After fitting the model, we calculate normalized residuals,
+
+\[
+r_i
+=
+\frac{n_i-\nu_i}{\sqrt{\nu_i}},
+\]
+
+where \(n_i\) is the observed number of events in a bin and \(\nu_i\) is the number predicted by the model.
+
+We then calculate the Pearson chi-square statistic,
+
+\[
+\chi^2
+=
+\sum_i
+\frac{(n_i-\nu_i)^2}{\nu_i},
+\]
+
+along with the reduced chi-square and corresponding p-value. These quantities are used as a binned goodness-of-fit check on the unbinned likelihood model.
+
+The reduced chi2 value near one supports the use of this model. One trait of a good fit is a chi2 value of approximatley one.
+
+The p-value indicates that it wouldn't be uncommon for repeated trials to get similar values for the chi2. This supports the case for this fit.
+
+The plot of normalized residuals appears to randomly distrubited around zero in an even fashion. This shows no systematic change in the way the model predicts the number of events over the mass range.
+
+### Signal Plus Background vs. Background Only
+
+We compare the signal-plus-background model with a background-only model using the likelihood-ratio statistic
+
+\[
+q
+=
+-2\ln\frac{L_{\mathrm{background}}}{L_{\mathrm{full}}}
+=
+2\left[
+(-\ln L)_{\mathrm{background}}
+-
+(-\ln L)_{\mathrm{full}}
+\right].
+\]
+
+A larger value of \(q\) means that the signal-plus-background model produces a substantially better likelihood than the background-only model.
+
+The large value of q means that there is a large difference in the least likehood fit between the model with peaks and the model with only background signal. Displaying how the signal + background improves the fit considerably from  a model with only background contributions.
+
+a p value of zero says for a background only hypothesis. getting a chi^2 differnce this large between the background model and the signal is extrmeely improbable. This supports the supposition that the "background only" model is inadequate
+
+Because the signal yields are bounded at zero, the usual Wilks-theorem chi-square approximation is not exact, so the likelihood-ratio p-value should be interpreted with this caveat.
+
+### Three-Peak vs. Four-Peak Model
+
+We also test whether adding a fourth Gaussian peak improves the description of the data. The four-peak model adds three additional parameters: a fourth signal yield, peak mean, and peak width.
+
+The comparison uses
+
+\[
+q_{3\rightarrow4}
+=
+-2\ln\frac{L_{3\mathrm{\ peak}}}{L_{4\mathrm{\ peak}}}
+=
+2\left[
+(-\ln L)_{3\mathrm{\ peak}}
+-
+(-\ln L)_{4\mathrm{\ peak}}
+\right].
+\]
+
+We expect Upsilon(4S) to be at 10.579 GeV, which was not found by the optimizer. 
+
+I plotted all four signals separately because I wanted to visualize where the optimizer set the fourth peak. From what we know about Upsilon(4S) this peak is not in the correct place, but we did a q value test to determine if the extra peak improved the fit.
+
+This confirmed our expectation. The small delta q means that the likelihood imporvement from the fourth peak was nominal while adding in three axtra parameters. The realtively large p value means that assuming the three peak model was correct, obtaining this chi^2 from this data was likely. Thus supporting the case for a three peak fit as opposed to the four peak fit.
+
+As in the background-only comparison, the additional signal yield is bounded at zero, so the standard Wilks-theorem approximation is not exact.
+
+### Profile Likelihood
+
+To get a sense of the uncertainty in each of the three signal yields, we calculate a profile likelihood. For each signal peak, we fix its yield to a range of values and refit all of the remaining parameters.
+
+The profile-likelihood statistic is
+
+\[
+q(\mu)
+=
+-2\ln
+\frac{L(\mu,\hat{\hat{\eta}}_\mu)}
+{L(\hat{\mu},\hat{\eta})}
+=
+2\left[
+-\ln L(\mu,\hat{\hat{\eta}}_\mu)
++
+\ln L(\hat{\mu},\hat{\eta})
+\right].
+\]
+
+For one parameter of interest, the approximate 68% confidence interval is found where
+
+\[
+\Delta q
+=
+q(\mu)-q(\hat{\mu})
+=
+1.
+\]
+
+This analysis produces the one standard deviation confidence interval around each of the signal yield parameters.
+
+It is work noting that the uncertainties are all between 40-100. However, the estimated count for the first peak is roughly 2.5x and 4x the estimate for the second and third peaks respectively, so our percent uncertainty for the estimate of the second and third peak is larger.
+
+We repeat this process to determine a confidence interval around the mass means. 
+
+### Parametric Bootstrap
+
+We also perform a parametric bootstrap as an independent check on the uncertainty of the fitted parameters. Using the parameters from the best fit, we generate fictitious datasets from the fitted model.
+
+Each simulated event is then assigned to one of the three signal peaks or the background according to the fitted component yields. Signal masses are sampled from the corresponding Gaussian distribution and background masses are sampled from the fitted Chebyshev distribution. Each fictitious dataset is then fit using the same extended unbinned likelihood used on the original data.
+
+We perform the parametric bootstrap as an estimate to the uncertainty present in each of the signal parameters. The method works by generating ficticious but plausible data sets. Our model is fitted to the ficticious data set and we evaluate the spread of our best fit parameters.
+
+It's straightforward to see that in the majority of ficticous datasets, our model chooses the same parameters we had deterimed from the given data set. Some spread is present, however, particulalry in terms of the signal means, the value are spread over relatively small regions around the best fit signal.
+
+### Sensitivity of Analysis
+
+It is worth noting that the measurement is sensitive to changes in the selected mass range. For instance, reducing the range from \(8.0-12.0\) GeV to \(9.0-11.0\) GeV causes fluctuations in the fitted mass means on the order of \(10^{-2}\) GeV. By comparison, aside from the upper \(1\sigma\) uncertainty on the \(\Upsilon(1S)\) peak, the 68% confidence intervals from the profile likelihood are on the order of \(10^{-3}-10^{-4}\) GeV. This indicates that the fitted mass means are more sensitive to the choice of mass window than would be suggested by the statistical uncertainty alone.
+
+
+
+## References
+
+- Most of this code was direclty adapted from Justin Stevens' PHYS 690 interactive lectures. Particularly lectures seven and eight.
+- The background model utilized was explained to me by Ben Curcio. Ben used this background model during his research with the GlueX group at Jefferson Laboratory. 
+- Generative AI was used via the VS code "Codex" extesnion. The nature of the usage was primarily to address syntax errors as I adapted the lecture 8 code from one gaussian to three and from an exponential to Chebychev background. 
+    - The exception being the bootstrap analysis section. The general structure of this section was developed by me (adapted from Justin Stevens). However, I struggled to produce a meaningful final product. After some time of attempting to solve it myself, I described the situation to ChatGPT, and utilized the suggestions. Explicitly, these suggestions include recognizing that the proposed random chebychev background should be larger than the model function and recognizing that the fake sample point belonged, with some probability to one of the peaks or the background, so we had to choose which signal to attribute the fake mass to.
+    - AI was used to translate the equations in the results/analysis sections to Latex as well as for spelling/grammar corrections. 
+
+
+
